@@ -3,16 +3,58 @@
 <head> 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LanM Game</title>
+    <title>拯救城市 - LanM Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css" />
     <script src="js/phaser.min.js"></script>
     <script type="module" src="js/game.js"></script>
 </head>
 <body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+    
     <div class="container">
-        <h1 class="title">拯救城市</h1>
-        <p class="subtitle">击退炸弹拯救城市</p>
+        <div class="header">
+            <div class="icon-wrapper">
+                <span class="icon">🛡️</span>
+            </div>
+            <h1 class="title">拯救城市</h1>
+            <p class="subtitle">💣 击退炸弹，守护家园 🏙️</p>
+        </div>
+        
         <div id="game-container"></div>
+        
+        <!-- 移动端输入区域 -->
+        <div id="mobile-input-area" class="mobile-input-area" style="display: none;">
+            <div class="mobile-input-header">
+                <span class="current-sentence-display" id="sentence-display">开始输入...</span>
+            </div>
+            <input 
+                type="text" 
+                id="mobile-input" 
+                class="mobile-input-field" 
+                placeholder="点击开始输入..."
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+            />
+            <div class="mobile-input-hint">💡 在上方输入框中输入句子</div>
+        </div>
+        
+        <div class="footer">
+            <div class="controls-hint">
+                <span class="hint-item" id="control-hint-desktop">⌨️ 使用键盘输入</span>
+                <span class="hint-item" id="control-hint-mobile" style="display: none;">📱 使用输入框输入</span>
+                <span class="hint-item">⚡ 快速反应得高分</span>
+            </div>
+        </div>
     </div>
 </body>
 </html>

@@ -24,6 +24,11 @@ const config = {
 
 const game = new Phaser.Game(config);
 
+// 检测是否为移动设备
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                 || ("ontouchstart" in window)
+                 || (navigator.maxTouchPoints > 0);
+
 // 游戏状态
 let gameState = "start"; // start, playing, gameOver
 let currentSentence = "";
@@ -38,6 +43,11 @@ const explosionCircle = null;
 let gameOverText = null;
 let savedLives = 0;
 let currentScene = null; // 保存场景引用
+
+// 移动端元素引用
+let mobileInputArea = null;
+let mobileInputField = null;
+let sentenceDisplay = null;
 
 // 句子库
 const sentences = [
@@ -56,11 +66,18 @@ const sentences = [
 function create() {
 	currentScene = this;
 
+	// 初始化移动端功能
+	initMobileSupport();
+
 	// 创建城市剪影
 	createCityscape(this);
 
-	// 显示开始指令
-	instructionText = this.add.text(300, 150, "使用键盘输入\n下方的英文句子", {
+	// 显示开始指令 - 根据设备类型调整文本
+	const instructionMsg = isMobile
+		? "使用输入框输入\n下方的英文句子"
+		: "使用键盘输入\n下方的英文句子";
+
+	instructionText = this.add.text(300, 150, instructionMsg, {
 		align: "center",
 		fill: "#f5f5dc",
 		fontFamily: "Arial, sans-serif",
@@ -75,8 +92,10 @@ function create() {
 		fontSize: "24px"
 	}).setOrigin(0.5);
 
-	// 监听键盘输入
-	this.input.keyboard.on("keydown", handleKeyPress, this);
+	// 监听键盘输入（仅在非移动端）
+	if (!isMobile) {
+		this.input.keyboard.on("keydown", handleKeyPress, this);
+	}
 }
 
 function createCityscape(scene) {
@@ -741,6 +760,161 @@ function update() {
 		// 检查炸弹是否到达地面
 		if (bomb.y >= 430) {
 			gameOver(this);
+		}
+	}
+}
+
+// 初始化移动端支持
+function initMobileSupport() {
+	if (!isMobile) return;
+
+	// 显示移动端控制提示
+	const desktopHint = document.getElementById("control-hint-desktop");
+	const mobileHint = document.getElementById("control-hint-mobile");
+	if (desktopHint) desktopHint.style.display = "none";
+	if (mobileHint) mobileHint.style.display = "inline-block";
+
+	// 获取移动端元素
+	mobileInputArea = document.getElementById("mobile-input-area");
+	mobileInputField = document.getElementById("mobile-input");
+	sentenceDisplay = document.getElementById("sentence-display");
+
+	// 显示移动端输入区域
+	if (mobileInputArea) {
+		mobileInputArea.style.display = "block";
+	}
+
+	// 更新句子显示
+	if (sentenceDisplay) {
+		sentenceDisplay.textContent = currentSentence;
+	}
+
+	// 监听输入框变化
+	if (mobileInputField) {
+		let lastInputLength = 0;
+
+		mobileInputField.addEventListener("input", (e) => {
+			const currentValue = e.target.value.toLowerCase();
+			const currentLength = currentValue.length;
+
+			// 判断是输入还是删除
+			if (currentLength > lastInputLength) {
+				// 用户输入了新字符
+				const newChar = currentValue[currentLength - 1];
+				handleMobileInput(newChar);
+			} else if (currentLength < lastInputLength) {
+				// 用户删除了字符 - 不允许删除
+				e.target.value = currentValue.substring(0, lastInputLength);
+			}
+
+			lastInputLength = currentLength;
+		});
+
+		// 游戏结束时允许重启
+		mobileInputField.addEventListener("keydown", (e) => {
+			if (gameState === "gameOver" && e.key === "Enter") {
+				restartGameMobile();
+			}
+		});
+
+		// 自动聚焦输入框
+		mobileInputField.focus();
+	}
+}
+
+// 处理移动端输入
+function handleMobileInput(char) {
+	if (!currentScene) return;
+
+	// 游戏结束时不处理输入
+	if (gameState === "gameOver") return;
+
+	// 检查当前字符是否正确（忽略空格）
+	const cleanInput = userInput.replace(/\s/g, "");
+	const cleanSentence = currentSentence.replace(/\s/g, "");
+
+	// 获取下一个应该输入的字符
+	const nextCharIndex = cleanInput.length;
+	const expectedChar = cleanSentence[nextCharIndex];
+
+	// 如果输入的是空格，跳过
+	if (char === " ") {
+		userInput += char;
+		updateInputDisplay();
+		return;
+	}
+
+	// 检查字符是否正确
+	if (char === expectedChar) {
+		// 正确的字符
+		userInput += char;
+		updateInputDisplay();
+
+		// 每输入一个正确字符就击退炸弹
+		if (gameState === "start") {
+			// 开始阶段不击退
+		} else if (gameState === "playing") {
+			pushBombUp(currentScene);
+		}
+
+		// 检查是否完成整个句子
+		const newCleanInput = userInput.replace(/\s/g, "");
+		if (newCleanInput === cleanSentence) {
+			// 完成整个句子
+			if (gameState === "start") {
+				startGame(currentScene);
+			} else if (gameState === "playing") {
+				// 完成句子，更换新句子
+				savedLives++;
+				nextSentence();
+				// 更新移动端句子显示
+				if (sentenceDisplay) {
+					sentenceDisplay.textContent = currentSentence;
+				}
+			}
+			userInput = "";
+			updateInputDisplay();
+
+			// 清空输入框
+			if (mobileInputField) {
+				mobileInputField.value = "";
+			}
+		}
+	} else {
+		// 错误的字符 - 给予反馈
+		if (mobileInputField) {
+			mobileInputField.style.borderColor = "rgba(255, 50, 50, 0.8)";
+			mobileInputField.style.background = "rgba(255, 200, 200, 0.9)";
+
+			setTimeout(() => {
+				mobileInputField.style.borderColor = "rgba(255, 255, 255, 0.4)";
+				mobileInputField.style.background = "rgba(255, 255, 255, 0.9)";
+			}, 200);
+
+			// 移除错误的字符
+			mobileInputField.value = userInput;
+		}
+	}
+}
+
+// 移动端重启游戏
+function restartGameMobile() {
+	if (currentScene) {
+		restartGame(currentScene);
+
+		// 清空输入框并重新聚焦
+		if (mobileInputField) {
+			mobileInputField.value = "";
+			setTimeout(() => {
+				mobileInputField.focus();
+			}, 600);
+		}
+
+		// 更新句子显示
+		if (sentenceDisplay) {
+			setTimeout(() => {
+				sentenceDisplay.textContent = currentSentence;
+			}, 600);
 		}
 	}
 }
