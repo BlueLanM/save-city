@@ -33,19 +33,30 @@
         <!-- 移动端输入区域 -->
         <div id="mobile-input-area" class="mobile-input-area" style="display: none;">
             <div class="mobile-input-header">
-                <span class="current-sentence-display" id="sentence-display">开始输入...</span>
+                <label class="mobile-input-label">📝 请输入以下句子：</label>
+                <div class="current-sentence-display" id="sentence-display">开始输入...</div>
             </div>
             <input 
                 type="text" 
                 id="mobile-input" 
                 class="mobile-input-field" 
-                placeholder="点击开始输入..."
+                placeholder="在此输入..."
                 autocomplete="off"
                 autocorrect="off"
                 autocapitalize="off"
                 spellcheck="false"
             />
-            <div class="mobile-input-hint">💡 在上方输入框中输入句子</div>
+            <div class="mobile-progress" id="mobile-progress">
+                <div class="mobile-progress-text">
+                    已输入: <span id="progress-count">0</span> / <span id="progress-total">0</span>
+                </div>
+                <div class="mobile-progress-bar">
+                    <div class="mobile-progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="mobile-input-hint">
+                <span class="emoji">💡</span>输入不区分大小写 · 输入正确才会生效
+            </div>
         </div>
         
         <div class="footer">

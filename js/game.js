@@ -48,6 +48,9 @@ let currentScene = null; // 保存场景引用
 let mobileInputArea = null;
 let mobileInputField = null;
 let sentenceDisplay = null;
+let progressCount = null;
+let progressTotal = null;
+let progressFill = null;
 
 // 句子库
 const sentences = [
@@ -778,16 +781,17 @@ function initMobileSupport() {
 	mobileInputArea = document.getElementById("mobile-input-area");
 	mobileInputField = document.getElementById("mobile-input");
 	sentenceDisplay = document.getElementById("sentence-display");
+	progressCount = document.getElementById("progress-count");
+	progressTotal = document.getElementById("progress-total");
+	progressFill = document.getElementById("progress-fill");
 
 	// 显示移动端输入区域
 	if (mobileInputArea) {
 		mobileInputArea.style.display = "block";
 	}
 
-	// 更新句子显示
-	if (sentenceDisplay) {
-		sentenceDisplay.textContent = currentSentence;
-	}
+	// 更新句子显示和进度
+	updateMobileDisplay();
 
 	// 监听输入框变化
 	if (mobileInputField) {
@@ -802,12 +806,12 @@ function initMobileSupport() {
 				// 用户输入了新字符
 				const newChar = currentValue[currentLength - 1];
 				handleMobileInput(newChar);
+				lastInputLength = mobileInputField.value.length; // 更新为实际长度
 			} else if (currentLength < lastInputLength) {
 				// 用户删除了字符 - 不允许删除
-				e.target.value = currentValue.substring(0, lastInputLength);
+				e.target.value = userInput;
+				lastInputLength = userInput.length;
 			}
-
-			lastInputLength = currentLength;
 		});
 
 		// 游戏结束时允许重启
@@ -820,6 +824,27 @@ function initMobileSupport() {
 		// 自动聚焦输入框
 		mobileInputField.focus();
 	}
+}
+
+// 更新移动端显示
+function updateMobileDisplay() {
+	if (!isMobile) return;
+
+	// 更新句子显示
+	if (sentenceDisplay) {
+		sentenceDisplay.textContent = currentSentence;
+	}
+
+	// 更新进度
+	const cleanInput = userInput.replace(/\s/g, "");
+	const cleanSentence = currentSentence.replace(/\s/g, "");
+	const typed = cleanInput.length;
+	const total = cleanSentence.length;
+	const percentage = total > 0 ? (typed / total) * 100 : 0;
+
+	if (progressCount) progressCount.textContent = typed;
+	if (progressTotal) progressTotal.textContent = total;
+	if (progressFill) progressFill.style.width = percentage + "%";
 }
 
 // 处理移动端输入
@@ -849,6 +874,7 @@ function handleMobileInput(char) {
 		// 正确的字符
 		userInput += char;
 		updateInputDisplay();
+		updateMobileDisplay(); // 更新进度
 
 		// 每输入一个正确字符就击退炸弹
 		if (gameState === "start") {
@@ -867,13 +893,10 @@ function handleMobileInput(char) {
 				// 完成句子，更换新句子
 				savedLives++;
 				nextSentence();
-				// 更新移动端句子显示
-				if (sentenceDisplay) {
-					sentenceDisplay.textContent = currentSentence;
-				}
 			}
 			userInput = "";
 			updateInputDisplay();
+			updateMobileDisplay(); // 更新为新句子
 
 			// 清空输入框
 			if (mobileInputField) {
@@ -883,13 +906,20 @@ function handleMobileInput(char) {
 	} else {
 		// 错误的字符 - 给予反馈
 		if (mobileInputField) {
+			// 添加抖动动画
+			mobileInputField.classList.add("input-error");
+			setTimeout(() => {
+				mobileInputField.classList.remove("input-error");
+			}, 300);
+
+			// 错误颜色反馈
 			mobileInputField.style.borderColor = "rgba(255, 50, 50, 0.8)";
 			mobileInputField.style.background = "rgba(255, 200, 200, 0.9)";
 
 			setTimeout(() => {
-				mobileInputField.style.borderColor = "rgba(255, 255, 255, 0.4)";
-				mobileInputField.style.background = "rgba(255, 255, 255, 0.9)";
-			}, 200);
+				mobileInputField.style.borderColor = "rgba(102, 126, 234, 0.6)";
+				mobileInputField.style.background = "rgba(255, 255, 255, 0.95)";
+			}, 300);
 
 			// 移除错误的字符
 			mobileInputField.value = userInput;

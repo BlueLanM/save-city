@@ -201,14 +201,15 @@ body {
 }
 /* 移动端输入区域 */
 .mobile-input-area {
-	margin-top: 20px;
-	padding: 20px;
-	border: 2px solid rgba(255, 255, 255, 0.25);
-	border-radius: 20px;
+	margin-top: 25px;
+	padding: 25px;
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	border-radius: 25px;
 	width: 100%;
 	max-width: 580px;
-	background: rgba(255, 255, 255, 0.15);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+	background: rgba(255, 255, 255, 0.18);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+	backdrop-filter: blur(10px);
 	animation: slideUp 0.5s ease-out;
 }
 @keyframes slideUp {
@@ -222,52 +223,114 @@ body {
 	}
 }
 .mobile-input-header {
-	margin-bottom: 12px;
+	margin-bottom: 15px;
 	text-align: center;
+}
+.mobile-input-label {
+	display: block;
+	margin-bottom: 8px;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+	font-weight: 600;
+	font-size: 0.9em;
+	color: #fff;
+	letter-spacing: 0.5px;
 }
 .current-sentence-display {
-	display: inline-block;
-	padding: 10px 20px;
-	border: 1px solid rgba(255, 255, 255, 0.3);
-	border-radius: 15px;
-	background: rgba(255, 255, 255, 0.2);
-	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-	font-family: 'Courier New', monospace;
-	font-weight: 700;
-	font-size: 1.1em;
-	color: #fff;
-	letter-spacing: 1px;
-}
-.mobile-input-field {
+	display: block;
 	padding: 15px 20px;
 	border: 2px solid rgba(255, 255, 255, 0.4);
-	border-radius: 15px;
-	width: 100%;
-	outline: none;
-	background: rgba(255, 255, 255, 0.9);
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+	border-radius: 18px;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	line-height: 1.6;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 	font-family: 'Courier New', monospace;
-	font-size: 1.1em;
+	font-weight: 700;
+	font-size: 1.3em;
+	color: #fff;
+	word-break: break-word;
+	letter-spacing: 2px;
+}
+.mobile-input-field {
+	padding: 18px 22px;
+	border: 3px solid rgba(102, 126, 234, 0.6);
+	border-radius: 18px;
+	width: 100%;
+	appearance: none;
+	appearance: none;
+	outline: none;
+	background: rgba(255, 255, 255, 0.95);
+	box-shadow: 
+		inset 0 2px 6px rgba(0, 0, 0, 0.08),
+		0 4px 12px rgba(0, 0, 0, 0.1);
+	font-family: 'Courier New', monospace;
+	font-size: 1.2em;
 	color: #333;
 	transition: all 0.3s ease;
+	touch-action: manipulation;
 }
 .mobile-input-field:focus {
-	border-color: rgba(255, 255, 255, 0.8);
+	border-color: rgba(102, 126, 234, 0.9);
 	background: rgba(255, 255, 255, 1);
 	box-shadow: 
-		inset 0 2px 4px rgba(0, 0, 0, 0.1),
-		0 0 0 3px rgba(255, 255, 255, 0.3);
+		inset 0 2px 6px rgba(0, 0, 0, 0.08),
+		0 0 0 4px rgba(102, 126, 234, 0.2),
+		0 6px 20px rgba(102, 126, 234, 0.3);
+	transform: translateY(-2px);
 }
 .mobile-input-field::placeholder {
+	opacity: 0.8;
 	font-style: italic;
-	color: #999;
+	color: #aaa;
 }
 .mobile-input-hint {
-	margin-top: 10px;
+	margin-top: 12px;
+	line-height: 1.4;
 	text-align: center;
-	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-	font-size: 0.9em;
-	color: #f0f0f0;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+	font-size: 0.85em;
+	color: #f5f5f5;
+}
+.mobile-input-hint .emoji {
+	margin-right: 4px;
+	font-size: 1.1em;
+}
+/* 输入反馈动画 */
+@keyframes shake {
+	0%, 100% { transform: translateX(0); }
+	25% { transform: translateX(-10px); }
+	75% { transform: translateX(10px); }
+}
+.input-error {
+	animation: shake 0.3s ease-in-out;
+}
+/* 移动端进度显示 */
+.mobile-progress {
+	margin-top: 15px;
+	padding: 12px;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.12);
+	text-align: center;
+}
+.mobile-progress-text {
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+	font-weight: 600;
+	font-size: 0.95em;
+	color: #fff;
+}
+.mobile-progress-bar {
+	overflow: hidden;
+	margin-top: 8px;
+	border-radius: 4px;
+	height: 8px;
+	background: rgba(255, 255, 255, 0.2);
+}
+.mobile-progress-fill {
+	border-radius: 4px;
+	height: 100%;
+	background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+	box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+	transition: width 0.3s ease;
 }
 /* 响应式设计 */
 @media (max-width: 768px) {
