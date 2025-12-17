@@ -21,3 +21,7 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+
+function create() {}
+
+function update() {}
